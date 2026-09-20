@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mirror — Posture & Eye Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ---- idle theme (light lavender / mint, per the wallpaper's light phone) ---- */
+    --bg-a: #c7aeeb;
+    --bg-b: #7fe0c0;
+    --bg-c: #e9defb;
+    --page: #f6f1e6;
+    --surface: rgba(255,255,255,0.86);
+    --surface-line: rgba(20,20,30,0.09);
+    --ink: #17231b;
+    --ink-dim: #57624f;
+    --icon-circle: #8fe8c9;
+    --icon-glyph: #123829;
+    --dot-idle: #3a4a63;
+
+    --sage: #3f8f68;
+    --amber: #c9821f;
+    --coral: #d9503f;
+
+    --display: 'Baloo 2', 'Segoe UI', sans-serif;
+    --body: 'Inter', 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Consolas', monospace;
+
+    --transition-theme: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ---- active theme (deep teal / navy, per the wallpaper's dark phone) ---- */
+  body.theme-active {
+    --bg-a: #12233b;
+    --bg-b: #123c2c;
+    --bg-c: #1a4a38;
+    --page: #0c1712;
+    --surface: rgba(15,26,20,0.72);
+    --surface-line: rgba(255,255,255,0.09);
+    --ink: #eef4ec;
+    --ink-dim: #9db3a6;
+    --icon-circle: #0e3b2e;
+    --icon-glyph: #8fe8c9;
+    --dot-idle: #dcefe8;
+
+    --sage: #7fe0c0;
+    --amber: #f0b955;
+    --coral: #ff8c78;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--body);
+    transition: background var(--transition-theme), color var(--transition-theme);
+  }
+
+  body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* organic blob backdrop                                            */
+  /* ---------------------------------------------------------------- */
+  .blob-field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .blob {
+    position: absolute;
+    filter: blur(70px);
+    opacity: 0.55;
+    transition: background var(--transition-theme), opacity var(--transition-theme);
+  }
+
+  .blob-a {
+    width: 620px; height: 620px;
+    top: -180px; left: -120px;
+    background: var(--bg-a);
+    border-radius: 42% 58% 65% 35% / 45% 40% 60% 55%;
+  }
+
+  .blob-b {
+    width: 560px; height: 560px;
+    top: 10%; right: -180px;
+    background: var(--bg-b);
+    border-radius: 60% 40% 35% 65% / 55% 60% 40% 45%;
+  }
+
+  .blob-c {
+    width: 480px; height: 480px;
+    bottom: -220px; left: 20%;
+    background: var(--bg-c);
+    border-radius: 50% 50% 40% 60% / 40% 55% 45% 60%;
+    opacity: 0.4;
+  }
+
+  .squiggle {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0.35;
+  }
+
+  .squiggle path {
+    stroke: var(--ink-dim);
+    transition: stroke var(--transition-theme);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* stage                                                             */
+  /* ---------------------------------------------------------------- */
+  .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 960px;
+  }
+
+  header.masthead {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .mark {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-radius: 46% 54% 61% 39% / 45% 41% 59% 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 0 var(--surface-line);
+    transition: background var(--transition-theme), border-radius 1.2s ease;
+  }
+
+  .mark svg { width: 26px; height: 26px; color: var(--ink); transition: color var(--transition-theme); }
+
+  .mark-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot-idle);
+    transition: background 0.6s ease;
+  }
+
+  .masthead-text h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 2px;
+    letter-spacing: 0.01em;
+  }
+
+  .masthead-text .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+
+  .daily-streak {
+    position: relative;
+    margin-left: auto;
+  }
+
+  .daily-streak-toggle {
+    width: 64px;
+    height: 64px;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    font-size: 36px;
+    line-height: 1;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 3px rgba(10,15,12,0.14));
+    transition: transform 0.15s ease, filter 0.3s ease, opacity 0.2s ease;
+  }
+
+  .daily-streak-toggle:hover { opacity: 1; }
+
+  .daily-streak-toggle:hover { transform: translateY(-1px); }
+  .daily-streak-toggle:active { transform: translateY(0) scale(0.95); }
+
+  .daily-streak-toggle.complete {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px var(--sage)) drop-shadow(0 2px 3px rgba(10,15,12,0.14));
+  }
+
+  .daily-streak-count-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--amber);
+    color: #2b1c04;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+  }
+
+  .daily-streak-count-dot.hidden { display: none; }
+
+  .daily-streak-popover {
+    position: absolute;
+    top: 74px;
+    right: 0;
+    z-index: 50;
+    width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 14px 32px rgba(10,15,12,0.22);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, background var(--transition-theme);
+  }
+
+  .daily-streak-popover.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .daily-streak-count {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .daily-streak-progress {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-dim);
+    line-height: 1.3;
+  }
+
+  .daily-streak-popover.complete .daily-streak-progress { color: var(--sage); }
+
+  .daily-streak-hint {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--surface-line);
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--ink-dim);
+  }
+
+  @media (max-width: 620px) {
+    header.masthead { flex-wrap: wrap; row-gap: 12px; }
+    .daily-streak-popover { right: 0; left: auto; }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* app-icon style control row                                        */
+  /* ---------------------------------------------------------------- */
+  .icon-row {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 26px;
+    padding: 4px 2px;
+  }
+
+  .app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--body);
+    color: var(--ink);
+    padding: 0;
+  }
+
+  .icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--icon-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-theme), transform 0.15s ease;
+  }
+
+  .icon-circle svg { width: 22px; height: 22px; color: var(--icon-glyph); transition: color var(--transition-theme); }
+
+  .app-icon:hover .icon-circle { transform: translateY(-2px) scale(1.04); }
+  .app-icon:active .icon-circle { transform: translateY(0) scale(0.97); }
+  .app-icon:disabled { opacity: 0.4; cursor: default; }
+  .app-icon:disabled .icon-circle { transform: none; }
+
+  .icon-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* layout                                                            */
+  /* ---------------------------------------------------------------- */
+  .layout {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 22px;
+  }
+
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; }
+    .icon-row { gap: 22px; }
+  }
+
+  .mirror-wrap {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 32px;
+    overflow: hidden;
+    background: #000;
+    isolation: isolate;
+    box-shadow: 0 1px 0 var(--surface-line);
+  }
+
+  .mirror-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 32px;
+    padding: 3px;
+    background: conic-gradient(
+      var(--ring-color, var(--sage)) calc(var(--ring-pct, 0) * 1%),
+      rgba(255,255,255,0.14) 0
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 3;
+    transition: background 0.6s ease;
+    pointer-events: none;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: block;
+  }
+
+  .veil {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    background: linear-gradient(160deg, #1c1330 0%, #0d1e18 100%);
+    z-index: 4;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .veil.hidden { display: none; }
+
+  .veil p {
+    color: #cfd6d0;
+    font-size: 13px;
+    max-width: 300px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  button.start {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 13px;
+    background: #eef0eb;
+    color: #14201a;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  button.start:hover { transform: translateY(-1px); background: #fff; }
+  button.start:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+  .status-chip {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 5;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: rgba(12,17,14,0.55);
+    backdrop-filter: blur(6px);
+    color: #eef0eb;
+    padding: 7px 12px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+
+  .status-chip .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ring-color, var(--sage));
+    transition: background 0.6s ease;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* vitals panel                                                      */
+  /* ---------------------------------------------------------------- */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .vital {
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 24px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    transition: background var(--transition-theme), border-color 0.4s ease;
+  }
+
+  .vital-icon-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--icon-circle);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.4s ease;
+  }
+
+  .vital-icon-badge svg { width: 18px; height: 18px; color: var(--icon-glyph); }
+
+  .vital-body { flex: 1; min-width: 0; }
+
+  .vital .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .vital .reading {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .vital .reading .unit {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    font-weight: 400;
+  }
+
+  .vital .note {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    margin-top: 8px;
+    line-height: 1.45;
+  }
+
+  .vital.warn .vital-icon-badge { background: var(--amber); }
+  .vital.warn .vital-icon-badge svg { color: #2b1c04; }
+  .vital.alert .vital-icon-badge { background: var(--coral); }
+  .vital.alert .vital-icon-badge svg { color: #2b0d07; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(63,143,104,0.16);
+    color: var(--sage);
+  }
+  .vital.warn .badge { background: rgba(201,130,31,0.16); color: var(--amber); }
+  .vital.alert .badge { background: rgba(217,80,63,0.16); color: var(--coral); }
+
+  /* ---------------------------------------------------------------- */
+  /* bottom pill bar (search-bar homage)                                */
+  /* ---------------------------------------------------------------- */
+  .pill-bar {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 999px;
+    padding: 13px 20px;
+    transition: background var(--transition-theme);
+  }
+
+  .pill-bar svg { width: 16px; height: 16px; color: var(--ink-dim); flex-shrink: 0; }
+
+  .pill-bar span {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    line-height: 1.4;
+  }
+
+  .pill-bar strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------------------------------------------------------------- */
+  /* pet assistant                                                     */
+  /* ---------------------------------------------------------------- */
+  .pet-wrap {
+    position: fixed;
+    right: 26px;
+    bottom: 26px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .pet-bubble {
+    max-width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 18px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink);
+    box-shadow: 0 6px 18px rgba(10,15,12,0.12);
+    transition: background var(--transition-theme), opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .pet-bubble.fade { opacity: 0; transform: translateY(4px) scale(0.98); }
+
+  .pet-toggle {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    color: var(--ink-dim);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .pet-blob-holder { position: relative; }
+
+  .pet-blob {
+    width: 84px;
+    height: 84px;
+    border-radius: 44% 56% 60% 40% / 48% 42% 58% 52%;
+    background: var(--icon-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    animation: pet-bob 3.4s ease-in-out infinite;
+    transition: background 0.5s ease, width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+    box-shadow: 0 6px 18px rgba(10,15,12,0.14);
+  }
+
+  .pet-blob.pet-warn { background: var(--amber); }
+  .pet-blob.pet-alert { background: var(--coral); }
+
+  @keyframes pet-bob {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-7px) rotate(1deg); }
+  }
+
+  .pet-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pet-eyes { display: flex; gap: 12px; }
+
+  .pet-eye {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--icon-glyph);
+    transition: transform 0.25s ease, height 0.25s ease;
+    animation: pet-blink 5s ease-in-out infinite;
+  }
+
+  @keyframes pet-blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.15); }
+  }
+
+  .pet-face.sleepy .pet-eye {
+    height: 2px;
+    border-radius: 2px;
+    animation: none;
+    transform: none;
+  }
+
+  .pet-mouth { width: 30px; height: 14px; overflow: visible; }
+  .pet-mouth path {
+    fill: none;
+    stroke: var(--icon-glyph);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: d 0.3s ease;
+  }
+
+  .pet-streak {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-dim);
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 999px;
+    padding: 3px 9px;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    transition: background var(--transition-theme);
+  }
+
+  .pet-wrap.collapsed .pet-bubble,
+  .pet-wrap.collapsed .pet-streak {
+    display: none;
+  }
+
+  .pet-wrap.collapsed .pet-blob {
+    width: 46px;
+    height: 46px;
+  }
+
+  .pet-wrap.collapsed .pet-face { transform: scale(0.55); }
+
+  .pet-blob { cursor: pointer; }
+
+  .pet-details {
+    position: absolute;
+    right: 100px;
+    bottom: 4px;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 24px rgba(10,15,12,0.18);
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, background var(--transition-theme);
+    z-index: 30;
+  }
+
+  .pet-details.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .pet-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 5px 0;
+    font-size: 12px;
+  }
+
+  .pet-detail-row + .pet-detail-row { border-top: 1px solid var(--surface-line); }
+  .pet-detail-row span:first-child { color: var(--ink-dim); }
+  .pet-detail-row span:last-child { font-family: var(--mono); color: var(--ink); }
+
+  .pet-detail-row.stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .pet-detail-quote {
+    font-family: var(--body) !important;
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+  }
+
+  .pet-pip-btn {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    color: var(--ink-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 0;
+    transition: background var(--transition-theme), color 0.2s ease;
+  }
+
+  .pet-pip-btn:hover { color: var(--ink); }
+  .pet-pip-btn svg { width: 11px; height: 11px; }
+  .pet-pip-btn.unsupported { display: none; }
+  .pet-pip-btn.active { color: var(--sage); }
+
+  /* layout when the pet has been popped into its own floating window —
+     a tall bar: blob near the top, its speech bubble text stacked below */
+  .pet-wrap.in-pip {
+    position: static;
+    margin: 0;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 28px 16px;
+    background: var(--surface);
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(10,15,12,0.18);
+  }
+
+  .pet-wrap.in-pip .pet-bubble {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .pet-wrap.in-pip .pet-details,
+  .pet-wrap.in-pip .pet-streak,
+  .pet-wrap.in-pip .pet-toggle,
+  .pet-wrap.in-pip .pet-pip-btn {
+    display: none;
+  }
+
+  .pet-wrap.in-pip .pet-blob-holder { position: static; flex-shrink: 0; }
+  .pet-wrap.in-pip .pet-blob { cursor: default; }
+
+  /* graceful shrink if the user resizes the floating window down */
+  @media (max-height: 140px) {
+    .pet-wrap.in-pip .pet-bubble { display: none; }
+    .pet-wrap.in-pip { justify-content: center; padding: 12px; }
+  }
+
+  @media (max-width: 760px) {
+    .pet-wrap { right: 16px; bottom: 16px; }
+    .pet-bubble { max-width: 170px; }
+    .pet-details { right: 90px; min-width: 150px; }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* dragon mascot, perched on the mirror frame                        */
+  /* ---------------------------------------------------------------- */
+  .mirror-shell {
+    position: relative;
+  }
+
+  .dragon {
+    position: absolute;
+    top: -70px;
+    left: 6px;
+    width: 148px;
+    z-index: 6;
+    transform: rotate(-3deg);
+    filter: drop-shadow(0 10px 12px rgba(10,15,12,0.28));
+    animation: dragon-sway 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes dragon-sway {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(1deg) translateY(3px); }
+  }
+
+  .dragon svg { width: 100%; height: auto; display: block; }
+
+  .dragon-bubble {
+    position: absolute;
+    top: -56px;
+    left: 118px;
+    z-index: 7;
+    max-width: 160px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 16px 16px 16px 4px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(10,15,12,0.14);
+    transition: background var(--transition-theme);
+  }
+
+  @media (max-width: 760px) {
+    .dragon { width: 110px; top: -52px; left: 2px; }
+    .dragon-bubble { top: -42px; left: 90px; max-width: 130px; font-size: 11.5px; }
+  }
+
+  .dragon-2 {
+    position: absolute;
+    top: -62px;
+    right: 8px;
+    width: 128px;
+    z-index: 6;
+    transform: rotate(3deg);
+    filter: drop-shadow(0 10px 12px rgba(10,15,12,0.28));
+    animation: dragon2-sway 4.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes dragon2-sway {
+    0%, 100% { transform: rotate(3deg) translateY(0); }
+    50% { transform: rotate(-1deg) translateY(4px); }
+  }
+
+  .dragon-2 svg, .dragon-2 img { width: 100%; height: auto; display: block; }
+
+  .dragon2-bubble {
+    position: absolute;
+    top: -50px;
+    right: 116px;
+    z-index: 7;
+    max-width: 150px;
+    background: var(--surface);
+    border: 1px solid var(--surface-line);
+    border-radius: 16px 16px 4px 16px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(10,15,12,0.14);
+    transition: background var(--transition-theme);
+    text-align: right;
+  }
+
+  @media (max-width: 760px) {
+    .dragon-2 { width: 96px; top: -46px; right: 2px; }
+    .dragon2-bubble { top: -38px; right: 84px; max-width: 118px; font-size: 11.5px; }
+  }
+</style>
+</head>
+<body class="theme-idle" id="body">
+
+<div class="blob-field" aria-hidden="true">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+  <svg class="squiggle" viewBox="0 0 1200 900" preserveAspectRatio="none">
+    <path d="M -50,650 C 150,600 250,750 420,680 C 600,600 700,500 900,540 C 1050,570 1150,480 1260,420"
+          fill="none" stroke-width="1.5"/>
+  </svg>
+</div>
+
+<div class="stage">
+  <header class="masthead">
+    <div class="mark">
+      <svg id="markIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+      </svg>
+      <span class="mark-dot" id="markDot"></span>
+    </div>
+    <div class="masthead-text">
+      <h1>The Mirror</h1>
+      <span class="tag">Posture &amp; Eye Coach · Runs Locally</span>
+    </div>
+    <div class="daily-streak" id="dailyStreakBadge">
+      <button class="daily-streak-toggle" id="dailyStreakToggle" title="Daily streak — click for details">🔥</button>
+      <span class="daily-streak-count-dot hidden" id="dailyStreakCountDot">0</span>
+      <div class="daily-streak-popover" id="dailyStreakPopover">
+        <div class="daily-streak-count" id="dailyStreakCount">0 day streak</div>
+        <div class="daily-streak-progress" id="dailyStreakProgress">0:00 / 10:00 today</div>
+        <div class="daily-streak-hint">Use the app 10+ minutes a day to keep this streak alive.</div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="icon-row">
+    <button class="app-icon" id="camToggle" title="Turn camera on">
+      <span class="icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 7l-7 5 7 5V7z"></path>
+          <rect x="1" y="5" width="15" height="14" rx="2"></rect>
+        </svg>
+      </span>
+      <span class="icon-label" id="camToggleLabel">Camera on</span>
+    </button>
+
+    <button class="app-icon" id="recalBtn" disabled title="Recalibrate posture baseline">
+      <span class="icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"></path>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+      </span>
+      <span class="icon-label">Recalibrate</span>
+    </button>
+  </nav>
+
+  <div class="layout">
+    <div class="mirror-shell">
+      <div class="dragon" aria-hidden="true">
+        <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+          <!-- tail mane -->
+          <path d="M108,190 C112,196 118,200 128,202 C120,206 110,206 102,202 C106,208 108,212 106,216 C98,214 92,208 90,200 Z" fill="#f0c986"/>
+          <!-- lower tail -->
+          <path d="M97,150 C104,165 108,180 103,196" fill="none" stroke="#2f8f63" stroke-width="14" stroke-linecap="round"/>
+          <!-- main coiled body -->
+          <path d="M46,52 C24,64 18,88 42,100 C68,112 96,96 100,120 C104,144 90,150 97,150"
+                fill="none" stroke="#2f8f63" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- belly scale hints -->
+          <path d="M40,66 C50,70 58,70 66,66" fill="none" stroke="#dff2e6" stroke-width="2.5" stroke-linecap="round" opacity="0.65"/>
+          <path d="M34,84 C44,89 54,89 62,83" fill="none" stroke="#dff2e6" stroke-width="2.5" stroke-linecap="round" opacity="0.65"/>
+          <!-- front leg -->
+          <path d="M40,98 C34,104 30,110 22,110 M40,98 C38,106 36,112 30,116" fill="none" stroke="#2f8f63" stroke-width="6" stroke-linecap="round"/>
+          <!-- mane behind head -->
+          <path d="M28,18 C22,10 14,8 6,12 C14,16 18,22 18,30 Z" fill="#f0c986"/>
+          <path d="M38,12 C34,4 26,0 18,2 C26,6 30,12 30,20 Z" fill="#f0c986"/>
+          <path d="M50,10 C48,2 42,-2 34,0 C40,4 42,10 40,16 Z" fill="#f0c986"/>
+          <!-- horns -->
+          <path d="M46,20 C44,10 48,4 56,4 C52,10 50,16 52,22 Z" fill="#f0c986"/>
+          <path d="M60,20 C60,10 66,4 74,6 C68,10 64,16 64,22 Z" fill="#f0c986"/>
+          <!-- head -->
+          <ellipse cx="60" cy="38" rx="26" ry="21" fill="#2f8f63"/>
+          <ellipse cx="88" cy="45" rx="14" ry="10" fill="#2f8f63"/>
+          <!-- snout details -->
+          <path d="M72,50 Q80,56 90,50" fill="none" stroke="#123829" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="88" cy="41" r="1.6" fill="#123829"/>
+          <!-- eye -->
+          <circle cx="58" cy="35" r="4.6" fill="#f6f7ec"/>
+          <circle cx="59.5" cy="35" r="2.4" fill="#123829"/>
+        </svg>
+      </div>
+      <div class="dragon-bubble">Sit tall — I've got your back!</div>
+
+      <div class="dragon-2" aria-hidden="true">
+        <!--
+          To use your own purchased dragon image instead of this
+          hand-drawn placeholder:
+            1. Save your file next to this HTML file as e.g. "dragon2.png"
+            2. Delete the <svg>...</svg> block below
+            3. Uncomment the <img> line below it
+        -->
+        <!-- <img src="dragon2.png" alt="Baby dragon mascot"> -->
+        <svg viewBox="0 0 190 210" xmlns="http://www.w3.org/2000/svg">
+          <!-- tail, curling down/right to dip into the frame -->
+          <path d="M140,140 C160,150 168,168 158,186 C152,182 150,174 144,170"
+                fill="none" stroke="#e8506b" stroke-width="14" stroke-linecap="round"/>
+          <path d="M150,178 C156,182 160,188 158,194 C152,192 148,188 146,182 Z" fill="#f7c9a8"/>
+          <!-- wings -->
+          <path d="M62,96 C36,86 18,92 10,110 C24,110 34,116 40,126 C34,120 26,118 18,120 C28,128 40,132 54,128 Z" fill="#f2718a" stroke="#7a2038" stroke-width="2.5"/>
+          <path d="M130,96 C156,86 174,92 182,110 C168,110 158,116 152,126 C158,120 166,118 174,120 C164,128 152,132 138,128 Z" fill="#f2718a" stroke="#7a2038" stroke-width="2.5"/>
+          <!-- feet -->
+          <ellipse cx="76" cy="188" rx="12" ry="8" fill="#e8506b"/>
+          <ellipse cx="112" cy="188" rx="12" ry="8" fill="#e8506b"/>
+          <!-- body -->
+          <path d="M56,110 C50,140 54,168 70,186 C86,196 106,196 122,186 C138,168 142,140 134,110 C126,92 64,92 56,110 Z" fill="#ef5f78" stroke="#7a2038" stroke-width="2.5"/>
+          <!-- belly -->
+          <path d="M74,120 C68,142 72,164 96,170 C120,164 124,142 118,120 C104,110 86,110 74,120 Z" fill="#f7d9b8"/>
+          <!-- small gem accent -->
+          <path d="M96,132 L104,140 L96,150 L88,140 Z" fill="#f2a63d"/>
+          <path d="M96,132 L104,140 L96,140 Z" fill="#f5c15c"/>
+          <!-- horns -->
+          <path d="M72,44 C66,32 68,22 78,18 C76,28 78,36 84,42 Z" fill="#ef5f78" stroke="#7a2038" stroke-width="2"/>
+          <path d="M96,40 C98,28 106,20 116,22 C110,30 108,38 110,44 Z" fill="#ef5f78" stroke="#7a2038" stroke-width="2"/>
+          <!-- head -->
+          <ellipse cx="94" cy="64" rx="34" ry="30" fill="#ef5f78" stroke="#7a2038" stroke-width="2.5"/>
+          <!-- head spines -->
+          <circle cx="94" cy="30" r="3.4" fill="#f2a63d"/>
+          <circle cx="94" cy="20" r="2.6" fill="#f2a63d"/>
+          <circle cx="94" cy="12" r="2" fill="#f2a63d"/>
+          <!-- ears -->
+          <path d="M60,52 C50,44 48,32 56,24 C58,36 62,44 68,50 Z" fill="#ef5f78" stroke="#7a2038" stroke-width="2"/>
+          <path d="M128,52 C138,44 140,32 132,24 C130,36 126,44 120,50 Z" fill="#ef5f78" stroke="#7a2038" stroke-width="2"/>
+          <!-- eyes -->
+          <circle cx="80" cy="64" r="10" fill="#fff"/>
+          <circle cx="108" cy="64" r="10" fill="#fff"/>
+          <circle cx="81" cy="66" r="6" fill="#3a1a4a"/>
+          <circle cx="109" cy="66" r="6" fill="#3a1a4a"/>
+          <circle cx="83" cy="63" r="1.8" fill="#fff"/>
+          <circle cx="111" cy="63" r="1.8" fill="#fff"/>
+          <!-- snout / mouth -->
+          <path d="M84,80 C90,86 98,86 104,80 C102,88 96,92 94,92 C92,92 86,88 84,80 Z" fill="#7a2038"/>
+          <!-- little heart -->
+          <path d="M28,58 C24,52 16,53 15,60 C15,66 22,71 28,76 C34,71 41,66 41,60 C40,53 32,52 28,58 Z" fill="#f2718a"/>
+        </svg>
+      </div>
+      <div class="dragon2-bubble" id="dragon2Bubble">Let's build a streak together!</div>
+
+      <div class="mirror-wrap" id="mirrorWrap" style="--ring-pct:0;">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="status-chip">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Idle</span>
+        </div>
+        <div class="veil" id="veil">
+          <p>Nothing is recorded or sent anywhere — the camera feed stays in this browser tab and is never saved.</p>
+          <button class="start" id="startBtn">Start camera</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="vital" id="postureCard">
+        <span class="vital-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5" r="2.2"></circle>
+            <path d="M12 7.5v6M12 13.5c-2 0-3.5 1.6-3.5 4v3M12 13.5c2 0 3.5 1.6 3.5 4v3M9 10.5h6"></path>
+          </svg>
+        </span>
+        <div class="vital-body">
+          <div class="label">Posture <span class="badge" id="postureBadge">—</span></div>
+          <div class="reading" id="postureReading">— <span class="unit">% drop</span></div>
+          <div class="note" id="postureNote">Sit up straight while the app calibrates your baseline.</div>
+        </div>
+      </div>
+
+      <div class="vital" id="eyeCard">
+        <span class="vital-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+        <div class="vital-body">
+          <div class="label">Blink rate <span class="badge" id="eyeBadge">—</span></div>
+          <div class="reading" id="eyeReading">— <span class="unit">blinks/min</span></div>
+          <div class="note" id="eyeNote">Tracking eye aspect ratio to catch screen-staring.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pill-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    <span><strong>Private by default.</strong> Video and landmark data never leave this tab. Only your daily streak count is saved locally in this browser, so it survives a refresh.</span>
+  </div>
+</div>
+
+<div class="pet-wrap" id="petWrap">
+  <div class="pet-bubble" id="petBubble">
+    <span id="petMessage">Turn me on and I'll help you sit tight!</span>
+  </div>
+  <div class="pet-details" id="petDetails">
+    <div class="pet-detail-row"><span>Posture</span><span id="petDetailPosture">— % drop</span></div>
+    <div class="pet-detail-row"><span>Blink rate</span><span id="petDetailBlink">— /min</span></div>
+    <div class="pet-detail-row stacked">
+      <span>What I said before</span>
+      <span id="petDetailLastSaid" class="pet-detail-quote">—</span>
+    </div>
+  </div>
+  <div class="pet-blob-holder">
+    <button class="pet-toggle" id="petToggle" title="Minimize assistant">×</button>
+    <button class="pet-pip-btn" id="petPipBtn" title="Keep this pet visible over other windows">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="12" height="12" rx="2"></rect>
+        <rect x="13" y="13" width="8" height="8" rx="1.5" fill="currentColor" stroke="none"></rect>
+      </svg>
+    </button>
+    <div class="pet-blob" id="petBlob">
+      <div class="pet-face" id="petFace">
+        <div class="pet-eyes">
+          <span class="pet-eye"></span>
+          <span class="pet-eye"></span>
+        </div>
+        <svg class="pet-mouth" viewBox="0 0 40 20">
+          <path id="petMouthPath" d="M10 9 Q20 9 30 9"></path>
+        </svg>
+      </div>
+    </div>
+    <span class="pet-streak" id="petStreak">Lv 1 · 0:00</span>
+  </div>
+</div>
+
+<script type="module">
+import {
+  FilesetResolver,
+  FaceLandmarker,
+  PoseLandmarker
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+// ---------------------------------------------------------------------
+// Config — the tunable thresholds
+// ---------------------------------------------------------------------
+const CONFIG = {
+  SLOUCH_DROP_THRESHOLD_PCT: 0.15,
+  CALIBRATION_MS: 3000,
+  EAR_THRESHOLD: 0.2,
+  LOW_BLINK_RATE_PER_MIN: 10,
+  BLINK_WINDOW_MS: 60000,
+};
+
+// Pose landmark indices (BlazePose)
+const LEFT_SHOULDER = 11, RIGHT_SHOULDER = 12, LEFT_EAR = 7, RIGHT_EAR = 8;
+// Face mesh eye indices for EAR
+const LEFT_EYE = [33, 160, 158, 133, 153, 144];
+const RIGHT_EYE = [362, 385, 387, 263, 373, 380];
+
+const els = {
+  body: document.getElementById('body'),
+  video: document.getElementById('video'),
+  veil: document.getElementById('veil'),
+  startBtn: document.getElementById('startBtn'),
+  camToggle: document.getElementById('camToggle'),
+  camToggleLabel: document.getElementById('camToggleLabel'),
+  recalBtn: document.getElementById('recalBtn'),
+  mirrorWrap: document.getElementById('mirrorWrap'),
+  statusDot: document.getElementById('statusDot'),
+  statusText: document.getElementById('statusText'),
+  markDot: document.getElementById('markDot'),
+  postureCard: document.getElementById('postureCard'),
+  postureBadge: document.getElementById('postureBadge'),
+  postureReading: document.getElementById('postureReading'),
+  postureNote: document.getElementById('postureNote'),
+  eyeCard: document.getElementById('eyeCard'),
+  eyeBadge: document.getElementById('eyeBadge'),
+  eyeReading: document.getElementById('eyeReading'),
+  eyeNote: document.getElementById('eyeNote'),
+  petWrap: document.getElementById('petWrap'),
+  petBubble: document.getElementById('petBubble'),
+  petMessage: document.getElementById('petMessage'),
+  petBlob: document.getElementById('petBlob'),
+  petFace: document.getElementById('petFace'),
+  petMouthPath: document.getElementById('petMouthPath'),
+  petToggle: document.getElementById('petToggle'),
+  petStreak: document.getElementById('petStreak'),
+  petDetails: document.getElementById('petDetails'),
+  petDetailPosture: document.getElementById('petDetailPosture'),
+  petDetailBlink: document.getElementById('petDetailBlink'),
+  petDetailLastSaid: document.getElementById('petDetailLastSaid'),
+  petPipBtn: document.getElementById('petPipBtn'),
+  dragon2Bubble: document.getElementById('dragon2Bubble'),
+  dailyStreakBadge: document.getElementById('dailyStreakBadge'),
+  dailyStreakToggle: document.getElementById('dailyStreakToggle'),
+  dailyStreakCountDot: document.getElementById('dailyStreakCountDot'),
+  dailyStreakPopover: document.getElementById('dailyStreakPopover'),
+  dailyStreakCount: document.getElementById('dailyStreakCount'),
+  dailyStreakProgress: document.getElementById('dailyStreakProgress'),
+};
+
+let faceLandmarker, poseLandmarker;
+let baselineDistance = null;
+let calibrationSamples = [];
+let calibrationStart = null;
+let blinkTimestamps = [];
+let eyeWasClosed = false;
+let running = false;
+let modelsReady = false;
+let mediaStream = null;
+
+// ---------------------------------------------------------------------
+// Daily streak — separate from the in-session posture/eye streak.
+// Rewards using the app for 10+ minutes in a day; persisted locally
+// (this browser only) so it survives across days. Nothing about video,
+// posture, or eye tracking is ever stored here — just a day string,
+// a seconds counter, and a streak count.
+// ---------------------------------------------------------------------
+const DAILY_STREAK_KEY = 'ergoMirrorDailyStreak';
+const DAILY_STREAK_THRESHOLD_SECONDS = 600; // 10 minutes
+
+let dailyStreakState = { streak: 0, lastCompletedDate: null, activeDate: null, activeSeconds: 0 };
+let dailyStreakInterval = null;
+
+function todayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function isYesterday(dateStr, todayStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const t = new Date(todayStr + 'T00:00:00');
+  const diffDays = Math.round((t - d) / 86400000);
+  return diffDays === 1;
+}
+
+function loadDailyStreakState() {
+  try {
+    const raw = localStorage.getItem(DAILY_STREAK_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.streak === 'number') return parsed;
+    }
+  } catch (e) { /* ignore malformed/blocked storage, fall back to default */ }
+  return { streak: 0, lastCompletedDate: null, activeDate: null, activeSeconds: 0 };
+}
+
+function saveDailyStreakState() {
+  try {
+    localStorage.setItem(DAILY_STREAK_KEY, JSON.stringify(dailyStreakState));
+  } catch (e) { /* storage unavailable — streak just won't persist this session */ }
+}
+
+function initDailyStreak() {
+  dailyStreakState = loadDailyStreakState();
+  const today = todayString();
+
+  if (dailyStreakState.activeDate !== today) {
+    dailyStreakState.activeDate = today;
+    dailyStreakState.activeSeconds = 0;
+  }
+
+  // Streak breaks if the last completed day wasn't today or yesterday.
+  if (
+    dailyStreakState.lastCompletedDate &&
+    dailyStreakState.lastCompletedDate !== today &&
+    !isYesterday(dailyStreakState.lastCompletedDate, today)
+  ) {
+    dailyStreakState.streak = 0;
+  }
+
+  saveDailyStreakState();
+  renderDailyStreak();
+}
+
+function renderDailyStreak() {
+  const n = dailyStreakState.streak;
+  els.dailyStreakCount.textContent = `${n} day${n === 1 ? '' : 's'} streak`;
+
+  els.dailyStreakCountDot.textContent = n;
+  els.dailyStreakCountDot.classList.toggle('hidden', n === 0);
+
+  const completedToday = dailyStreakState.lastCompletedDate === dailyStreakState.activeDate;
+  els.dailyStreakToggle.classList.toggle('complete', completedToday);
+  els.dailyStreakPopover.classList.toggle('complete', completedToday);
+
+  if (completedToday) {
+    els.dailyStreakProgress.textContent = "✓ today's goal done";
+  } else {
+    const mm = Math.floor(dailyStreakState.activeSeconds / 60);
+    const ss = Math.floor(dailyStreakState.activeSeconds % 60).toString().padStart(2, '0');
+    els.dailyStreakProgress.textContent = `${mm}:${ss} / 10:00 today`;
+  }
+}
+
+els.dailyStreakToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  els.dailyStreakPopover.classList.toggle('open');
+});
+
+document.addEventListener('click', (e) => {
+  if (!els.dailyStreakBadge.contains(e.target)) {
+    els.dailyStreakPopover.classList.remove('open');
+  }
+});
+
+function startDailyStreakTimer() {
+  if (dailyStreakInterval) return;
+  dailyStreakInterval = setInterval(() => {
+    const today = todayString();
+    if (dailyStreakState.activeDate !== today) {
+      // date rolled over mid-session
+      dailyStreakState.activeDate = today;
+      dailyStreakState.activeSeconds = 0;
+    }
+
+    dailyStreakState.activeSeconds += 1;
+
+    if (
+      dailyStreakState.activeSeconds >= DAILY_STREAK_THRESHOLD_SECONDS &&
+      dailyStreakState.lastCompletedDate !== dailyStreakState.activeDate
+    ) {
+      dailyStreakState.streak += 1;
+      dailyStreakState.lastCompletedDate = dailyStreakState.activeDate;
+    }
+
+    renderDailyStreak();
+    saveDailyStreakState();
+  }, 1000);
+}
+
+function stopDailyStreakTimer() {
+  if (dailyStreakInterval) {
+    clearInterval(dailyStreakInterval);
+    dailyStreakInterval = null;
+  }
+  saveDailyStreakState();
+}
+
+window.addEventListener('beforeunload', saveDailyStreakState);
+initDailyStreak();
+
+// ---------------------------------------------------------------------
+// Pet assistant
+// ---------------------------------------------------------------------
+const PET_MOUTHS = {
+  idle:        "M10 9 Q20 9 30 9",
+  calibrating: "M10 9 Q20 9 30 9",
+  good:        "M10 6 Q20 16 30 6",
+  slouch:      "M10 12 Q20 6 30 12",
+  eyestrain:   "M14 10 Q20 7 26 10",
+};
+
+// Every line here is written to be encouraging and collaborative, never
+// shaming — the goal is a coach that celebrates small wins with the user,
+// not one that scolds them about their body. Quotes/idioms are adapted
+// paraphrases of well-known sayings, reworded in the pet's own voice
+// rather than quoted verbatim.
+const PET_MESSAGES = {
+  idle: [
+    "Turn me on and I'll help you sit tight!",
+    "Ready whenever you are.",
+    "A journey of a thousand miles starts with one upright step.",
+  ],
+  calibrating: [
+    "Hold still — measuring your baseline…",
+    "Sit up tall, just a few more seconds…",
+    "Good things take a moment to set up. Almost there.",
+  ],
+  good: [
+    "Nice posture — keep it up!",
+    "You're on a roll. Streak's building.",
+    "Eyes and back both look happy.",
+    "This is the good stuff. Stay here.",
+    "Small steps, tall spine — that's how habits stick.",
+    "Slow and steady really does win this race.",
+    "Practice makes progress, not perfection. You're proving it.",
+    "Rome wasn't built in a day, and neither is a great habit — nice work today.",
+    "A stitch in time saves nine. This is your stitch.",
+    "Well begun is half done. You've begun beautifully.",
+  ],
+  slouch: [
+    "Chin up, shoulders back?",
+    "I felt that slouch — straighten up a bit.",
+    "Let's fix that posture together.",
+    "Every tall tree started by growing straight, one day at a time.",
+    "No rush — just gently roll those shoulders back with me.",
+  ],
+  eyestrain: [
+    "Try the 20-20-20 rule — look far away for 20s.",
+    "Your blink rate's low. Blink a bit more!",
+    "Give your eyes a quick break.",
+    "Even the best focus needs a breather now and then.",
+  ],
+};
+
+let petStatus = null;
+let petLastMessageTime = 0;
+let petLastMessage = '';
+let petCollapsed = false;
+let goodStreakStart = null;
+let bestStreakSeconds = 0;
+let petLastStreakLabel = '';
+let dragon2LastText = '';
+
+function streakDragonMessage(status, currentSeconds, level) {
+  if (status === 'good') {
+    if (currentSeconds < 15) return "Nice start — keep it going!";
+    const mm = Math.floor(currentSeconds / 60);
+    const ss = Math.floor(currentSeconds % 60).toString().padStart(2, '0');
+    return `🔥 ${mm}:${ss} streak — Lv ${level}, on fire!`;
+  }
+  if (status === 'idle') return "No streak yet — let's fly together!";
+  if (bestStreakSeconds >= 15) return `Streak reset — best was Lv ${level}. Climb back!`;
+  return "Let's build that streak — sit tall!";
+}
+
+function setDragon2Message(text) {
+  if (text === dragon2LastText) return;
+  dragon2LastText = text;
+  els.dragon2Bubble.textContent = text;
+}
+
+function pickPetMessage(status) {
+  const pool = PET_MESSAGES[status] || PET_MESSAGES.idle;
+  let choice = pool[Math.floor(Math.random() * pool.length)];
+  if (pool.length > 1 && choice === petLastMessage) {
+    choice = pool[(pool.indexOf(choice) + 1) % pool.length];
+  }
+  petLastMessage = choice;
+  return choice;
+}
+
+function showPetMessage(text) {
+  // remember what it said last, so the details panel can show it on request
+  const previousText = els.petMessage.textContent;
+  if (previousText && previousText !== text) {
+    els.petDetailLastSaid.textContent = previousText;
+  }
+
+  els.petBubble.classList.add('fade');
+  setTimeout(() => {
+    els.petMessage.textContent = text;
+    els.petBubble.classList.remove('fade');
+  }, 180);
+}
+
+function setPetExpression(status) {
+  els.petBlob.classList.remove('pet-warn', 'pet-alert');
+  els.petFace.classList.remove('sleepy');
+
+  if (status === 'slouch' || status === 'eyestrain') {
+    els.petBlob.classList.add(status === 'eyestrain' ? 'pet-warn' : 'pet-warn');
+  }
+  if (status === 'idle') {
+    els.petFace.classList.add('sleepy');
+  }
+
+  els.petMouthPath.setAttribute('d', PET_MOUTHS[status] || PET_MOUTHS.idle);
+}
+
+function computeOverallStatus() {
+  if (!running) return 'idle';
+  if (baselineDistance === null) return 'calibrating';
+  if (els.postureCard.classList.contains('warn')) return 'slouch';
+  if (els.eyeCard.classList.contains('warn')) return 'eyestrain';
+  return 'good';
+}
+
+function updatePet(now) {
+  const status = computeOverallStatus();
+
+  if (status !== petStatus) {
+    petStatus = status;
+    setPetExpression(status);
+    showPetMessage(pickPetMessage(status));
+    petLastMessageTime = now;
+  } else if (now - petLastMessageTime > 14000) {
+    showPetMessage(pickPetMessage(status));
+    petLastMessageTime = now;
+  }
+
+  // streak tracking — rewards continuous good posture + healthy blink rate
+  if (status === 'good') {
+    if (goodStreakStart === null) goodStreakStart = now;
+    const currentSeconds = (now - goodStreakStart) / 1000;
+    if (currentSeconds > bestStreakSeconds) bestStreakSeconds = currentSeconds;
+
+    const level = Math.floor(bestStreakSeconds / 60) + 1;
+    const mm = Math.floor(currentSeconds / 60);
+    const ss = Math.floor(currentSeconds % 60).toString().padStart(2, '0');
+    const label = `Lv ${level} · ${mm}:${ss}`;
+    if (label !== petLastStreakLabel) {
+      els.petStreak.textContent = label;
+      petLastStreakLabel = label;
+    }
+    setDragon2Message(streakDragonMessage(status, currentSeconds, level));
+  } else {
+    goodStreakStart = null;
+    const level = Math.floor(bestStreakSeconds / 60) + 1;
+    const label = `Lv ${level} · 0:00`;
+    if (label !== petLastStreakLabel) {
+      els.petStreak.textContent = label;
+      petLastStreakLabel = label;
+    }
+    setDragon2Message(streakDragonMessage(status, 0, level));
+  }
+}
+
+function resetPet() {
+  petStatus = null;
+  goodStreakStart = null;
+  bestStreakSeconds = 0;
+  petLastStreakLabel = '';
+  dragon2LastText = '';
+  els.petStreak.textContent = 'Lv 1 · 0:00';
+  els.dragon2Bubble.textContent = "No streak yet — let's fly together!";
+  els.petDetailPosture.textContent = '— % drop';
+  els.petDetailBlink.textContent = '— /min';
+  els.petDetails.classList.remove('open');
+  setPetExpression('idle');
+  showPetMessage(pickPetMessage('idle'));
+}
+
+els.petToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  petCollapsed = !petCollapsed;
+  els.petWrap.classList.toggle('collapsed', petCollapsed);
+  els.petToggle.textContent = petCollapsed ? '+' : '×';
+  els.petToggle.title = petCollapsed ? 'Expand assistant' : 'Minimize assistant';
+  if (petCollapsed) els.petDetails.classList.remove('open');
+});
+
+els.petBlob.addEventListener('click', () => {
+  if (petCollapsed) {
+    petCollapsed = false;
+    els.petWrap.classList.remove('collapsed');
+    els.petToggle.textContent = '×';
+    els.petToggle.title = 'Minimize assistant';
+    return;
+  }
+  els.petDetails.classList.toggle('open');
+});
+
+document.addEventListener('click', (e) => {
+  if (!els.petWrap.contains(e.target)) {
+    els.petDetails.classList.remove('open');
+  }
+});
+
+// ---------------------------------------------------------------------
+// Float the pet in its own always-on-top window (Document Picture-in-
+// Picture). Supported in Chrome/Edge; the button hides itself elsewhere.
+// ---------------------------------------------------------------------
+let pipWindow = null;
+
+async function openPetPip() {
+  if (!('documentPictureInPicture' in window)) return;
+  if (pipWindow) { pipWindow.focus(); return; }
+
+  try {
+    // Tight, near-square window sized just for the blob (84px) plus room
+    // for its bob animation and soft shadow — not a big rectangle.
+    // 6cm x 15.4cm at 96 CSS px/inch (37.8 px/cm) — tall bar shape.
+    // Note: the Document PiP API has no position option — Chrome always
+    // opens these in the bottom-right of the screen, and there's no way
+    // for page code to request a different corner. It's draggable once
+    // open, though.
+    pipWindow = await documentPictureInPicture.requestWindow({ width: 227, height: 582 });
+  } catch (e) {
+    return; // user dismissed the permission prompt, or it's unavailable right now
+  }
+
+  document.querySelectorAll('link[rel="stylesheet"], link[rel="preconnect"]').forEach(link => {
+    pipWindow.document.head.appendChild(link.cloneNode(true));
+  });
+  const styleTag = document.querySelector('style');
+  if (styleTag) pipWindow.document.head.appendChild(styleTag.cloneNode(true));
+
+  pipWindow.document.documentElement.style.background = 'transparent';
+  pipWindow.document.body.className = document.body.className;
+  Object.assign(pipWindow.document.body.style, {
+    margin: '0',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    background: 'transparent',
+  });
+
+  els.petWrap.classList.add('in-pip');
+  els.petDetails.classList.remove('open');
+  pipWindow.document.body.appendChild(els.petWrap);
+  els.petPipBtn.classList.add('active');
+  els.petPipBtn.title = 'Bring the pet back into this tab';
+
+  pipWindow.addEventListener('pagehide', () => {
+    els.petWrap.classList.remove('in-pip');
+    document.body.appendChild(els.petWrap);
+    els.petPipBtn.classList.remove('active');
+    els.petPipBtn.title = 'Keep this pet visible over other windows';
+    pipWindow = null;
+  }, { once: true });
+}
+
+if ('documentPictureInPicture' in window) {
+  els.petPipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (pipWindow) {
+      pipWindow.close();
+    } else {
+      openPetPip();
+    }
+  });
+
+  // Auto-float the pet when the user switches away from this tab, so it
+  // keeps coaching them even while they're on another window. Browsers
+  // require a recent user gesture to open a new window at all — if this
+  // tab hasn't had any click/keypress recently, the browser may silently
+  // block the auto-open, and openPetPip() already fails safely in that case.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && !pipWindow && running) {
+      openPetPip();
+    }
+  });
+} else {
+  els.petPipBtn.classList.add('unsupported');
+}
+
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function eyeAspectRatio(landmarks, idx) {
+  const [p1, p2, p3, p4, p5, p6] = idx.map(i => landmarks[i]);
+  const v1 = dist(p2, p6), v2 = dist(p3, p5), h = dist(p1, p4);
+  if (h === 0) return 0;
+  return (v1 + v2) / (2 * h);
+}
+
+function setRing(colorVar, pct) {
+  els.mirrorWrap.style.setProperty('--ring-color', colorVar);
+  els.mirrorWrap.style.setProperty('--ring-pct', Math.max(0, Math.min(100, pct)));
+  els.statusDot.style.background = colorVar;
+  els.markDot.style.background = colorVar;
+}
+
+async function setup() {
+  const vision = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+  );
+
+  faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+    },
+    runningMode: "VIDEO",
+    numFaces: 1,
+  });
+
+  poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+    },
+    runningMode: "VIDEO",
+    numPoses: 1,
+  });
+}
+
+async function startCamera() {
+  els.startBtn.disabled = true;
+  els.startBtn.textContent = modelsReady ? 'Starting…' : 'Loading models…';
+  els.camToggle.disabled = true;
+
+  if (!modelsReady) {
+    await setup();
+    modelsReady = true;
+  }
+
+  mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+  els.video.srcObject = mediaStream;
+  await new Promise(r => els.video.onloadedmetadata = r);
+  els.video.play();
+
+  els.veil.classList.add('hidden');
+  setCamToggleState(true);
+  els.recalBtn.disabled = false;
+
+  resetTrackingState();
+  els.statusText.textContent = 'Calibrating…';
+  running = true;
+  calibrationStart = performance.now();
+  resetPet();
+  startDailyStreakTimer();
+  requestAnimationFrame(loop);
+
+  els.startBtn.disabled = false;
+  els.startBtn.textContent = 'Start camera';
+  els.camToggle.disabled = false;
+}
+
+function stopCamera() {
+  running = false;
+  stopDailyStreakTimer();
+
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+  }
+  els.video.srcObject = null;
+
+  els.veil.classList.remove('hidden');
+  setCamToggleState(false);
+  els.recalBtn.disabled = true;
+  els.statusText.textContent = 'Idle';
+  setRing('var(--sage)', 0);
+
+  resetTrackingState();
+  resetReadouts();
+  resetPet();
+}
+
+function recalibrate() {
+  if (!running) return;
+  resetTrackingState();
+  calibrationStart = performance.now();
+  els.statusText.textContent = 'Calibrating…';
+  resetReadouts();
+}
+
+function resetTrackingState() {
+  baselineDistance = null;
+  calibrationSamples = [];
+  blinkTimestamps = [];
+  eyeWasClosed = false;
+}
+
+function resetReadouts() {
+  els.postureCard.className = 'vital';
+  els.postureBadge.textContent = '—';
+  els.postureReading.innerHTML = '— <span class="unit">% drop</span>';
+  els.postureNote.textContent = 'Sit up straight while the app calibrates your baseline.';
+
+  els.eyeCard.className = 'vital';
+  els.eyeBadge.textContent = '—';
+  els.eyeReading.innerHTML = '— <span class="unit">blinks/min</span>';
+  els.eyeNote.textContent = 'Tracking eye aspect ratio to catch screen-staring.';
+}
+
+// The button always names the ACTION a click performs, not the current
+// state — so while the camera is on, it reads "Camera off" (click to
+// turn off), and while it's off, it reads "Camera on" (click to turn on).
+function setCamToggleState(isOn) {
+  els.camToggle.title = isOn ? 'Turn camera off' : 'Turn camera on';
+  els.camToggleLabel.textContent = isOn ? 'Camera off' : 'Camera on';
+}
+
+function loop() {
+  if (!running) return;
+  const now = performance.now();
+
+  const poseResult = poseLandmarker.detectForVideo(els.video, now);
+  const faceResult = faceLandmarker.detectForVideo(els.video, now);
+
+  handlePose(poseResult, now);
+  handleEyes(faceResult, now);
+  updatePet(now);
+
+  requestAnimationFrame(loop);
+}
+
+function handlePose(result, now) {
+  if (!result.landmarks || result.landmarks.length === 0) return;
+  const lm = result.landmarks[0];
+
+  const shoulderY = (lm[LEFT_SHOULDER].y + lm[RIGHT_SHOULDER].y) / 2;
+  const earY = (lm[LEFT_EAR].y + lm[RIGHT_EAR].y) / 2;
+  const distance = shoulderY - earY;
+
+  if (baselineDistance === null) {
+    calibrationSamples.push(distance);
+    if (now - calibrationStart >= CONFIG.CALIBRATION_MS && calibrationSamples.length >= 15) {
+      baselineDistance = calibrationSamples.reduce((a, b) => a + b, 0) / calibrationSamples.length;
+      els.statusText.textContent = 'Tracking';
+    }
+    return;
+  }
+
+  const pctDrop = 1 - (distance / baselineDistance);
+  const pctDisplay = Math.round(pctDrop * 100);
+
+  if (pctDrop >= CONFIG.SLOUCH_DROP_THRESHOLD_PCT) {
+    els.postureCard.className = 'vital warn';
+    els.postureBadge.textContent = 'Slouching';
+    els.postureNote.textContent = 'Ear position has dropped toward your shoulders — roll your shoulders back.';
+    setRing('var(--amber)', 100);
+    els.statusText.textContent = 'Posture check';
+  } else {
+    els.postureCard.className = 'vital';
+    els.postureBadge.textContent = 'Upright';
+    els.postureNote.textContent = 'Holding close to your calibrated baseline.';
+    if (els.statusText.textContent !== 'Eye strain') {
+      setRing('var(--sage)', 100);
+      els.statusText.textContent = 'Tracking';
+    }
+  }
+
+  els.postureReading.innerHTML = `${pctDisplay < 0 ? 0 : pctDisplay} <span class="unit">% drop</span>`;
+  els.petDetailPosture.textContent = `${pctDisplay < 0 ? 0 : pctDisplay}% drop`;
+}
+
+function handleEyes(result, now) {
+  if (!result.faceLandmarks || result.faceLandmarks.length === 0) return;
+  const lm = result.faceLandmarks[0];
+
+  const leftEAR = eyeAspectRatio(lm, LEFT_EYE);
+  const rightEAR = eyeAspectRatio(lm, RIGHT_EYE);
+  const ear = (leftEAR + rightEAR) / 2;
+  const isClosed = ear < CONFIG.EAR_THRESHOLD;
+
+  if (isClosed) {
+    eyeWasClosed = true;
+  } else if (eyeWasClosed) {
+    eyeWasClosed = false;
+    blinkTimestamps.push(now);
+  }
+
+  blinkTimestamps = blinkTimestamps.filter(t => now - t <= CONFIG.BLINK_WINDOW_MS);
+  const windowMinutes = CONFIG.BLINK_WINDOW_MS / 60000;
+  const rate = blinkTimestamps.length / windowMinutes;
+
+  els.eyeReading.innerHTML = `${rate.toFixed(0)} <span class="unit">blinks/min</span>`;
+  els.petDetailBlink.textContent = `${rate.toFixed(0)}/min`;
+
+  const enoughData = now - calibrationStart > CONFIG.BLINK_WINDOW_MS * 0.3;
+  if (enoughData && rate < CONFIG.LOW_BLINK_RATE_PER_MIN) {
+    els.eyeCard.className = 'vital warn';
+    els.eyeBadge.textContent = 'Low rate';
+    els.eyeNote.textContent = 'Try the 20-20-20 rule: look at something 20 feet away for 20 seconds.';
+    setRing('var(--amber)', 100);
+    els.statusText.textContent = 'Eye strain';
+  } else {
+    els.eyeCard.className = 'vital';
+    els.eyeBadge.textContent = 'Normal';
+    els.eyeNote.textContent = 'Tracking eye aspect ratio to catch screen-staring.';
+  }
+}
+
+els.startBtn.addEventListener('click', startCamera);
+els.recalBtn.addEventListener('click', recalibrate);
+
+els.camToggle.addEventListener('click', () => {
+  if (running) {
+    stopCamera();
+  } else {
+    startCamera();
+  }
+});
+</script>
+
+</body>
+</html>
